@@ -24,10 +24,10 @@ def dashboard(request):
     labels = list(session_count.keys())  
     data = list(session_count.values())  
 
-    last_7_days = timezone.now() - timedelta(days=7)
-    recent_sessions = sessions.filter(date__gte=last_7_days)
-    line_labels = [(timezone.now() - timedelta(days=i)).date() for i in range(7)]
-    line_data = [recent_sessions.filter(date=(timezone.now() - timedelta(days=i)).date()).count() for i in range(7)]
+
+    subject_count = Counter(session.topic for session in sessions)
+    pie_labels = list(subject_count.keys())  # Subjects/Topics
+    pie_data = list(subject_count.values())  # Session counts for each subject
 
     return render(request, 'tutoring/dashboard.html', {
         'tutor': tutor,
@@ -35,20 +35,9 @@ def dashboard(request):
         'sessions': sessions,
         'labels': labels,  
         'data': data,  
-        'line_labels': line_labels,  
-        'line_data': line_data,  
+        'pie_labels': pie_labels,  
+        'pie_data': pie_data,  
     })
-
-# @login_required
-# def dashboard(request):
-#     tutor = Tutor.objects.get(user=request.user)  # Get the tutor associated with the logged-in user
-#     students = tutor.students.all() 
-#     sessions = tutor.sessions.all() 
-#     return render(request, 'tutoring/dashboard.html', {
-#         'tutor': tutor, 
-#         'students': students,
-#         'sessions': sessions
-#     })
 
 
 @login_required
